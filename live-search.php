@@ -6,7 +6,9 @@ Description: A plugin to add live search functionality to your WordPress site.
 Version: 1.0.0
 Author: Mohammad Anbarestany
 Author URI: http://anbarestany.ir
-License: GPL3
+Text Domain: live-search
+Domain Path: /languages
+License: Commercial
 */
 
 // Enqueue the necessary scripts
@@ -14,11 +16,14 @@ function live_search_enqueue_scripts() {
     wp_enqueue_script('jquery');
     wp_enqueue_script('live-search', plugin_dir_url(__FILE__) . 'assets/js/live-search.js', array('jquery'), '1.0', true);
     wp_enqueue_style('live-search-style', plugin_dir_url(__FILE__) . 'assets/css/style.css');
-    
-    // Add this line to localize the AJAX URL
     wp_localize_script('live-search', 'ajaxurl', admin_url('admin-ajax.php'));
 }
 add_action('wp_enqueue_scripts', 'live_search_enqueue_scripts');
+
+// Load the text domain
+function live_search_load_textdomain() {
+    load_plugin_textdomain('live-search', false, plugin_dir_path(__FILE__) . '/languages');
+}
 
 // Handle the AJAX request
 function live_search_ajax() {
@@ -39,7 +44,7 @@ function live_search_ajax() {
             <?php
         }
     } else {
-        echo '<div class="live-search-no-results">No results found</div>';
+        echo '<div class="live-search-no-results">' . esc_html__('No results found', 'live-search') . '</div>';
     }
     wp_reset_postdata();
     wp_die();
