@@ -16,7 +16,10 @@ function live_search_enqueue_scripts() {
     wp_enqueue_script('jquery');
     wp_enqueue_script('live-search', plugin_dir_url(__FILE__) . 'assets/js/live-search.js', array('jquery'), '1.0', true);
     wp_enqueue_style('live-search-style', plugin_dir_url(__FILE__) . 'assets/css/style.css');
-    wp_localize_script('live-search', 'ajaxurl', admin_url('admin-ajax.php'));
+    
+    wp_localize_script('live-search', 'liveSearchData', array(
+        'ajaxurl' => admin_url('admin-ajax.php')
+    ));
 }
 add_action('wp_enqueue_scripts', 'live_search_enqueue_scripts');
 
@@ -28,6 +31,9 @@ add_action('plugins_loaded', 'live_search_load_textdomain');
 
 // Handle the AJAX request
 function live_search_ajax() {
+    $plugin_dir = dirname(plugin_basename(__FILE__));
+    load_plugin_textdomain('live-search', false, $plugin_dir . '/languages');
+    
     $search_query = $_GET['s'];
     $args = array(
         's' => $search_query,
@@ -46,7 +52,7 @@ function live_search_ajax() {
         }
     } else {
         echo '<div class="live-search-no-results">';
-        echo esc_html__('No results found', 'live-search'); 
+        echo esc_html__('no results found...', 'live-search');
         echo '</div>';
     }
     wp_reset_postdata();

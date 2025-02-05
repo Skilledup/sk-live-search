@@ -52,7 +52,7 @@ jQuery(document).ready(function($) {
                     $loadingIndicator.show();
                     
                     $.ajax({
-                        url: ajaxurl,
+                        url: liveSearchData.ajaxurl,
                         type: 'GET',
                         data: {
                             action: 'live_search',
