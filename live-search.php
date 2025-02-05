@@ -20,39 +20,6 @@ function live_search_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'live_search_enqueue_scripts');
 
-// Remove the shortcode-based form function since we won't need it
-// remove: add_shortcode('live_search', 'live_search_form');
-
-// Add this function to modify existing search forms
-function live_search_modify_form() {
-    ?>
-    <script>
-    jQuery(document).ready(function($) {
-        // Convert regular search forms to live search
-        $('form[role="search"], .search-form, form.search').each(function() {
-            let $form = $(this);
-            let $input = $form.find('input[type="search"], input[name="s"]');
-            let $submitButton = $form.find('input[type="submit"], button[type="submit"]');
-            
-            // Add autocomplete=off
-            $input.attr('autocomplete', 'off');
-            
-            // Add results container
-            $form.append('<div id="live-search-results" class="live-search-results"></div>');
-            
-            // Prevent form submission while using live search
-            $form.on('submit', function(e) {
-                if ($input.val().length >= 3) {
-                    e.preventDefault();
-                }
-            });
-        });
-    });
-    </script>
-    <?php
-}
-add_action('wp_footer', 'live_search_modify_form');
-
 // Handle the AJAX request
 function live_search_ajax() {
     $search_query = $_GET['s'];

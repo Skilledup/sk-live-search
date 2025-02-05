@@ -16,6 +16,18 @@ form.search {
     border-radius: 4px;
 }
 
+.search-input-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.search-input-wrapper input[type="search"] {
+    width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
 .live-search-results {
     position: absolute;
     top: 100%;
@@ -53,4 +65,24 @@ form.search {
     padding: 10px;
     color: #666;
     text-align: center;
+}
+
+.live-search-loading {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: none;
+    z-index: 100;
+}
+
+@keyframes spin {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
 }

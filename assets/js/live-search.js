@@ -1,32 +1,71 @@
 jQuery(document).ready(function($) {
     let searchTimer;
     
-    // Target all search inputs
-    $('form[role="search"] input[type="search"], .search-form input[type="search"], form.search input[name="s"]').on('input', function() {
-        clearTimeout(searchTimer);
-        const $input = $(this);
-        const $form = $input.closest('form');
-        const $results = $form.find('.live-search-results');
-        const searchQuery = $input.val();
+    // Select and process search forms
+    $('form[role="search"], .search-form, form.search').each(function() {
+        let $form = $(this);
+        let $input = $form.find('input[type="search"], input[name="s"]');
         
-        if (searchQuery.length < 3) {
-            $results.empty().hide();
-            return;
+        // Add results container if not exists
+        if (!$form.find('.live-search-results').length) {
+            $form.append('<div class="live-search-results"></div>');
         }
-
-        searchTimer = setTimeout(function() {
-            $.ajax({
-                url: ajaxurl,
-                type: 'GET',
-                data: {
-                    action: 'live_search',
-                    s: searchQuery
-                },
-                success: function(response) {
-                    $results.html(response).show();
+        
+        // Prevent form submission for live search
+        $form.on('submit', function(e) {
+            if ($input.val().length >= 3) {
+                e.preventDefault();
+            }
+        });
+        
+        // Process input
+        $input.not('.search-input-processed')
+            .addClass('search-input-processed')
+            .attr('autocomplete', 'off')
+            .each(function() {
+                if (!$(this).parent().hasClass('search-input-wrapper')) {
+                    $(this).wrap('<div class="search-input-wrapper"></div>');
                 }
+            }).on('input', function() {
+                clearTimeout(searchTimer);
+                const $input = $(this);
+                const $wrapper = $input.parent('.search-input-wrapper');
+                const $form = $input.closest('form');
+                const $results = $form.find('.live-search-results');
+                const searchQuery = $input.val();
+                
+                // Add loading indicator if not exists
+                if (!$wrapper.find('.live-search-loading').length) {
+                    $wrapper.append('<div class="live-search-loading"></div>');
+                }
+                
+                if (searchQuery.length < 3) {
+                    $results.empty().hide();
+                    $wrapper.find('.live-search-loading').hide();
+                    return;
+                }
+
+                $results.hide();
+                const $loadingIndicator = $wrapper.find('.live-search-loading');
+
+                searchTimer = setTimeout(function() {
+                    $loadingIndicator.show();
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'GET',
+                        data: {
+                            action: 'live_search',
+                            s: searchQuery
+                        },
+                        success: function(response) {
+                            $results.html(response).show();
+                        }
+                    }).always(function() {
+                        $loadingIndicator.hide();
+                    });
+                }, 500);
             });
-        }, 500);
     });
 
     // Close results when clicking outside
