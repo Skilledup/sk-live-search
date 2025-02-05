@@ -1,3 +1,13 @@
+/* Fixes for WP */
+.wp-block-search__inside-wrapper {
+    background-color: #fff;
+}
+
+:root :where(.wp-block-search .wp-element-button, .wp-block-search .wp-block-button__link) {
+    margin: 0;
+}
+/* end of fixes */
+
 form[role="search"],
 .search-form,
 form.search {
@@ -29,14 +39,15 @@ form.search {
 }
 
 .live-search-results {
+    max-width: 390px;
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     background: #fff;
     border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 4px 4px;
+    border-radius: 4px;
+    margin-top: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: none;
@@ -80,6 +91,11 @@ form.search {
     animation: spin 1s linear infinite;
     display: none;
     z-index: 100;
+}
+
+.live-search-loading:dir(rtl) {
+    left: 12px;
+    right: auto;
 }
 
 @keyframes spin {

@@ -22,8 +22,9 @@ add_action('wp_enqueue_scripts', 'live_search_enqueue_scripts');
 
 // Load the text domain
 function live_search_load_textdomain() {
-    load_plugin_textdomain('live-search', false, plugin_dir_path(__FILE__) . '/languages');
+    load_plugin_textdomain('live-search', false, plugin_dir_path(__FILE__) . '/languages/');
 }
+add_action('plugins_loaded', 'live_search_load_textdomain');
 
 // Handle the AJAX request
 function live_search_ajax() {
@@ -44,7 +45,9 @@ function live_search_ajax() {
             <?php
         }
     } else {
-        echo '<div class="live-search-no-results">' . esc_html__('No results found', 'live-search') . '</div>';
+        echo '<div class="live-search-no-results">';
+        echo esc_html__('No results found', 'live-search'); 
+        echo '</div>';
     }
     wp_reset_postdata();
     wp_die();
