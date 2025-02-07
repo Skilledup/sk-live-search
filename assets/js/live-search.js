@@ -13,9 +13,9 @@ jQuery(document).ready(function($) {
         
         // Prevent form submission for live search
         $form.on('submit', function(e) {
-            if ($input.val().length >= 3) {
-                e.preventDefault();
-            }
+            // Hide live search results before submitting
+            $form.find('.live-search-results').hide();
+            // Let the form submit normally - no preventDefault()
         });
         
         // Process input
