@@ -40,6 +40,12 @@ function live_search_ajax() {
         'post_status' => 'publish',
         'posts_per_page' => 10,
     );
+    
+    // Get total number of posts for this search
+    $total_query = new WP_Query(array_merge($args, array('posts_per_page' => -1)));
+    $total_posts = $total_query->found_posts;
+    wp_reset_postdata();
+    
     $query = new WP_Query($args);
     if ($query->have_posts()) {
         while ($query->have_posts()) {
@@ -47,6 +53,17 @@ function live_search_ajax() {
             ?>
             <div class="live-search-result">
                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+            </div>
+            <?php
+        }
+        
+        // Add "More results..." link if there are more than 10 results
+        if ($total_posts > 10) {
+            ?>
+            <div class="live-search-more-results">
+                <a href="<?php echo esc_url(home_url('/?s=' . urlencode($search_query))); ?>">
+                    <?php echo esc_html__('More results...', 'live-search'); ?>
+                </a>
             </div>
             <?php
         }

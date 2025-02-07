@@ -38,3 +38,7 @@ msgstr ""
 #: live-search.php:49
 msgid "no results found..."
 msgstr ""
+
+#: live-search.php:65
+msgid "More results..."
+msgstr ""

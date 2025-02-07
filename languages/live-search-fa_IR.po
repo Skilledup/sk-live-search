@@ -39,3 +39,7 @@ msgstr "محمد عنبرستانی"
 #: live-search.php:49
 msgid "no results found..."
 msgstr "نتیجه‌ای یافت نشد..."
+
+#: live-search.php:65
+msgid "More results..."
+msgstr "نتایج بیشتر..."

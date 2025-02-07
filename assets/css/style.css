@@ -102,3 +102,20 @@ form.search {
     0% { transform: translateY(-50%) rotate(0deg); }
     100% { transform: translateY(-50%) rotate(360deg); }
 }
+
+.live-search-more-results {
+    padding: 10px;
+    background: #f7f7f7;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+.live-search-more-results a {
+    color: #0073aa;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.live-search-more-results a:hover {
+    text-decoration: underline;
+}
