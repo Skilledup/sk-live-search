@@ -1,14 +1,14 @@
 <?php
 /*
-Plugin Name: Live Search
-Plugin URI: http://anbarestany.ir
+Plugin Name: SK Live Search
+Plugin URI: 
 Description: A plugin to add live search functionality to your WordPress site.
 Version: 1.0.0
 Author: Mohammad Anbarestany
 Author URI: http://anbarestany.ir
 Text Domain: live-search
 Domain Path: /languages
-License: Commercial
+License: GPL-3.0
 */
 
 // Enqueue the necessary scripts
