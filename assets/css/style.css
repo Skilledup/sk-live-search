@@ -119,3 +119,9 @@ form.search {
 .live-search-more-results a:hover {
     text-decoration: underline;
 }
+
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}

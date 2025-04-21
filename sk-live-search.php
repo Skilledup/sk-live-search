@@ -3,7 +3,7 @@
 Plugin Name: SK Live Search
 Plugin URI: 
 Description: A plugin to add live search functionality to your WordPress site.
-Version: 1.0.0
+Version: 1.0.1
 Author: Mohammad Anbarestany
 Author URI: http://anbarestany.ir
 Text Domain: live-search
