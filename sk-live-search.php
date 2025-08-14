@@ -33,7 +33,7 @@ function live_search_load_textdomain()
 add_action('plugins_loaded', 'live_search_load_textdomain');
 
 /**
- * Get multilingual search URL that works with Polylang, WPML, and other multilingual plugins
+ * Get multilingual search URL that works with Polylang and WPML
  * 
  * @param string $search_query The search query to append to the URL
  * @return string The complete search URL with language support
@@ -61,15 +61,9 @@ function sk_live_search_get_multilingual_search_url($search_query) {
             }
         }
     }
-    // Check for other multilingual plugins using the standard get_locale() approach
-    elseif (function_exists('get_locale')) {
-        $locale = get_locale();
-        // Extract language code from locale (e.g., 'fr_FR' -> 'fr')
-        $lang_code = substr($locale, 0, 2);
-        // Only add language code if it's not the default English
-        if ($lang_code !== 'en' && $lang_code !== get_option('WPLANG', 'en')) {
-            $base_url = home_url('/' . $lang_code . '/');
-        }
+    // fallback
+    else {
+        $base_url = home_url('/');
     }
     
     // Ensure the base URL ends with a slash
