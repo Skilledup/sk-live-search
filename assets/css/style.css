@@ -125,3 +125,110 @@ form.search {
   -webkit-appearance: none;
   appearance: none;
 }
+
+/* Accessibility: Screen reader only text */
+.screen-reader-text {
+    border: 0;
+    clip: rect(1px, 1px, 1px, 1px);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute !important;
+    width: 1px;
+    word-wrap: normal !important;
+}
+
+/* Accessibility: Focus and selection styles */
+.live-search-result:focus,
+.live-search-more-results:focus,
+.live-search-result.live-search-selected,
+.live-search-more-results.live-search-selected {
+    background-color: #e6f3ff;
+    outline: 2px solid #0073aa;
+    outline-offset: -2px;
+}
+
+.live-search-result:focus a,
+.live-search-more-results:focus a,
+.live-search-result.live-search-selected a,
+.live-search-more-results.live-search-selected a {
+    color: #0073aa;
+    text-decoration: underline;
+}
+
+/* Enhanced focus styles for keyboard navigation */
+.live-search-results [role="option"]:focus,
+.live-search-results [role="option"].live-search-selected {
+    background-color: #e6f3ff;
+    border-color: #0073aa;
+    transition: background-color 0.15s ease-in-out;
+}
+
+/* Better scrollbar for results container */
+.live-search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f9f9f9;
+}
+
+.live-search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.live-search-results::-webkit-scrollbar-track {
+    background: #f9f9f9;
+}
+
+.live-search-results::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.live-search-results::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+    .live-search-result:focus,
+    .live-search-more-results:focus,
+    .live-search-result.live-search-selected,
+    .live-search-more-results.live-search-selected {
+        background-color: HighlightText;
+        color: Highlight;
+        outline: 3px solid Highlight;
+    }
+    
+    .live-search-result:focus a,
+    .live-search-more-results:focus a,
+    .live-search-result.live-search-selected a,
+    .live-search-more-results.live-search-selected a {
+        color: inherit;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .live-search-results [role="option"]:focus,
+    .live-search-results [role="option"].live-search-selected {
+        transition: none;
+    }
+    
+    .live-search-loading {
+        animation: none;
+        border: 2px solid #3498db;
+        border-radius: 50%;
+    }
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 600px) {
+    .live-search-results {
+        max-width: 100%;
+        left: 0;
+        right: 0;
+    }
+}

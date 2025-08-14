@@ -3,9 +3,9 @@
 Plugin Name: SK Live Search
 Plugin URI: 
 Description: A plugin to add live search functionality to your WordPress site.
-Version: 1.0.1
+Version: 1.0.3
 Author: Mohammad Anbarestany
-Author URI: http://anbarestany.ir
+Author URI: https://anbarestany.ir
 Text Domain: live-search
 Domain Path: /languages
 License: GPL-3.0
@@ -66,30 +66,35 @@ function live_search_ajax()
     $total_query = new WP_Query(array_merge($args, array('posts_per_page' => -1)));
     $total_posts = $total_query->found_posts;
     wp_reset_postdata();
-    
+
     $query = new WP_Query($args);
     if ($query->have_posts()) {
+        $result_index = 0;
         while ($query->have_posts()) {
             $query->the_post();
-?>          
-            <div class="live-search-result">
-                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+            $result_index++;
+?>
+            <div class="live-search-result" role="option" tabindex="-1" aria-selected="false" data-result-index="<?php echo esc_attr($result_index); ?>">
+                <a href="<?php the_permalink(); ?>" tabindex="-1" aria-label="<?php echo esc_attr(sprintf(__('Search result %d: %s', 'live-search'), $result_index, get_the_title())); ?>">
+                    <?php the_title(); ?>
+                </a>
             </div>
         <?php
         }
 
         // Add "More results..." link if there are more than 10 results
         if ($total_posts > 10) {
+            $result_index++;
         ?>
-            <div class="live-search-more-results">
-                <a href="<?php echo esc_url(home_url('/?s=' . urlencode($search_query))); ?>">
+            <div class="live-search-more-results" role="option" tabindex="-1" aria-selected="false" data-result-index="<?php echo esc_attr($result_index); ?>">
+                <a href="<?php echo esc_url(home_url('/?s=' . urlencode($search_query))); ?>" tabindex="-1" aria-label="<?php echo esc_attr(sprintf(__('View all %d search results for: %s', 'live-search'), $total_posts, $search_query)); ?>">
                     <?php echo esc_html__('More results...', 'live-search'); ?>
                 </a>
             </div>
 <?php
         }
     } else {
-        echo '<div class="live-search-no-results">';
+        echo '<div class="live-search-no-results" role="status" aria-live="polite">';
         echo esc_html__('no results found...', 'live-search');
         echo '</div>';
     }
