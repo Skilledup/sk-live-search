@@ -1,12 +1,19 @@
-# Live Search
+# SK Live Search
 
-Live Search is a powerful and efficient search tool that provides real-time search results as you type. It is designed to be fast, responsive, and easy to integrate into any web application.
+AJAX-powered, instant search results for your WordPress search forms. Works out of the box.
 
 ## Features
 
-- **Real-time Search**: Get instant search results as you type.
-- **Easy Integration**: Simple to integrate with any web application.
-- **Customizable**: Easily customizable to fit your needs.
-- **Lightweight**: Minimal impact on performance.
+- Real-time results (AJAX)
+- Multilingual: Polylang, WPML, or fallback to default
+- Accessible: ARIA + keyboard navigation
+- Secure: nonce + sanitized input
+- Translation-ready
+
+## Usage
+
+- Use a standard WordPress search form; results appear below the input.
+- Min query: 3 chars. Shows up to 10 results + a "More results..." link.
+
 
 
