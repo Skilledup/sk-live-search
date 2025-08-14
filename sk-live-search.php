@@ -32,6 +32,53 @@ function live_search_load_textdomain()
 }
 add_action('plugins_loaded', 'live_search_load_textdomain');
 
+/**
+ * Get multilingual search URL that works with Polylang, WPML, and other multilingual plugins
+ * 
+ * @param string $search_query The search query to append to the URL
+ * @return string The complete search URL with language support
+ */
+function sk_live_search_get_multilingual_search_url($search_query) {
+    $base_url = home_url('/');
+    
+    // Check for Polylang plugin
+    if (function_exists('pll_current_language') && function_exists('pll_home_url')) {
+        $current_lang = pll_current_language();
+        if ($current_lang) {
+            $base_url = pll_home_url($current_lang);
+        }
+    }
+    // Check for WPML plugin
+    elseif (function_exists('apply_filters') && has_filter('wpml_current_language')) {
+        $current_lang = apply_filters('wpml_current_language', null);
+        if ($current_lang) {
+            // For WPML, we need to get the home URL for the current language
+            if (function_exists('apply_filters') && has_filter('wpml_home_url')) {
+                $base_url = apply_filters('wpml_home_url', home_url('/'), $current_lang);
+            } else {
+                // Fallback: construct URL manually for WPML
+                $base_url = home_url('/' . $current_lang . '/');
+            }
+        }
+    }
+    // Check for other multilingual plugins using the standard get_locale() approach
+    elseif (function_exists('get_locale')) {
+        $locale = get_locale();
+        // Extract language code from locale (e.g., 'fr_FR' -> 'fr')
+        $lang_code = substr($locale, 0, 2);
+        // Only add language code if it's not the default English
+        if ($lang_code !== 'en' && $lang_code !== get_option('WPLANG', 'en')) {
+            $base_url = home_url('/' . $lang_code . '/');
+        }
+    }
+    
+    // Ensure the base URL ends with a slash
+    $base_url = trailingslashit($base_url);
+    
+    // Append the search query
+    return $base_url . '?s=' . urlencode($search_query);
+}
+
 // Handle the AJAX request
 function live_search_ajax()
 {
@@ -87,7 +134,7 @@ function live_search_ajax()
             $result_index++;
         ?>
             <div class="live-search-more-results" role="option" tabindex="-1" aria-selected="false" data-result-index="<?php echo esc_attr($result_index); ?>">
-                <a href="<?php echo esc_url(home_url('/?s=' . urlencode($search_query))); ?>" tabindex="-1" aria-label="<?php echo esc_attr(sprintf(__('View all %d search results for: %s', 'live-search'), $total_posts, $search_query)); ?>">
+                <a href="<?php echo esc_url(sk_live_search_get_multilingual_search_url($search_query)); ?>" tabindex="-1" aria-label="<?php echo esc_attr(sprintf(__('View all %d search results for: %s', 'live-search'), $total_posts, $search_query)); ?>">
                     <?php echo esc_html__('More results...', 'live-search'); ?>
                 </a>
             </div>
