@@ -2,7 +2,7 @@
 # This file is distributed under the Commercial.
 msgid ""
 msgstr ""
-"Project-Id-Version: Live Search 1.0.0\n"
+"Project-Id-Version: Live Search 1.0.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/live-search\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,4 +41,60 @@ msgstr ""
 
 #: live-search.php:65
 msgid "More results..."
+msgstr ""
+
+#: sk-live-search.php:128
+msgid "Missing nonce"
+msgstr ""
+
+#: sk-live-search.php:135
+msgid "Invalid nonce"
+msgstr ""
+
+#: sk-live-search.php:234
+msgid "SK Live Search Cache Configuration:"
+msgstr ""
+
+#: sk-live-search.php:236
+msgid "We detected caching plugin(s): %s"
+msgstr ""
+
+#: sk-live-search.php:239
+msgid "For optimal performance with live search, consider excluding these URLs from caching:"
+msgstr ""
+
+#: sk-live-search.php:245
+msgid "Also consider setting cache expiration to 1 hour or less for pages with search functionality."
+msgstr ""
+
+#: sk-live-search.php:41
+msgid "Search suggestions"
+msgstr ""
+
+#: sk-live-search.php:42
+msgid "1 suggestion available"
+msgstr ""
+
+#: sk-live-search.php:43
+msgid "%d suggestions available"
+msgstr ""
+
+#: sk-live-search.php:44
+msgid "Search temporarily unavailable. Please try again."
+msgstr ""
+
+#: sk-live-search.php:45
+msgid "Search security token refreshed successfully"
+msgstr ""
+
+#: sk-live-search.php:46
+msgid "Search security token refresh failed"
+msgstr ""
+
+#: sk-live-search.php:47
+msgid "Security token error detected, attempting refresh and retry"
+msgstr ""
+
+#: sk-live-search.php:48
+msgid "Search request failed"
 msgstr ""

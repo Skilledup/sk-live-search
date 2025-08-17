@@ -36,7 +36,17 @@ function live_search_enqueue_scripts()
         'nonce' => wp_create_nonce('live_search_nonce'),
         'nonce_timestamp' => time(),
         'refresh_nonce_action' => 'live_search_refresh_nonce',
-        'cache_aware_mode' => true
+        'cache_aware_mode' => true,
+        'i18n' => array(
+            'search_suggestions' => __('Search suggestions', 'live-search'),
+            'one_suggestion' => __('1 suggestion available', 'live-search'),
+            'suggestions_available' => __('%d suggestions available', 'live-search'),
+            'search_unavailable' => __('Search temporarily unavailable. Please try again.', 'live-search'),
+            'nonce_refreshed' => __('Search security token refreshed successfully', 'live-search'),
+            'nonce_refresh_failed' => __('Search security token refresh failed', 'live-search'),
+            'nonce_error_detected' => __('Security token error detected, attempting refresh and retry', 'live-search'),
+            'search_failed' => __('Search request failed', 'live-search')
+        )
     ));
 }
 add_action('wp_enqueue_scripts', 'live_search_enqueue_scripts');
@@ -59,9 +69,9 @@ function sk_live_search_get_multilingual_search_url($search_query) {
     
     // Check for Polylang plugin
     if (function_exists('pll_current_language') && function_exists('pll_home_url')) {
-        $current_lang = call_user_func('pll_current_language');
+        $current_lang = pll_current_language();
         if ($current_lang) {
-            $base_url = call_user_func('pll_home_url', $current_lang);
+            $base_url = pll_home_url($current_lang);
         }
     }
     // Check for WPML plugin
@@ -115,14 +125,14 @@ function live_search_ajax()
 {
     if (!isset($_POST['nonce'])) {
         wp_send_json_error(array(
-            'message' => 'Missing nonce',
+            'message' => __('Missing nonce', 'live-search'),
             'code' => 'missing_nonce'
         ));
     }
 
     if (!wp_verify_nonce($_POST['nonce'], 'live_search_nonce')) {
         wp_send_json_error(array(
-            'message' => 'Invalid nonce',
+            'message' => __('Invalid nonce', 'live-search'),
             'code' => 'invalid_nonce'
         ));
     }
@@ -188,7 +198,11 @@ function live_search_ajax()
 add_action('wp_ajax_live_search', 'live_search_ajax');
 add_action('wp_ajax_nopriv_live_search', 'live_search_ajax');
 
-// Add cache exclusion notice for administrators
+/**
+ * Show cache exclusion notice for administrators
+ *
+ * @return void
+ */
 function live_search_cache_exclusion_notice() {
     // Only show to administrators
     if (!current_user_can('manage_options')) {
@@ -217,15 +231,18 @@ function live_search_cache_exclusion_notice() {
     if (!empty($cache_plugins)) {
         ?>
         <div class="notice notice-info is-dismissible" id="live-search-cache-notice">
-            <p><strong>SK Live Search Cache Configuration:</strong></p>
-            <p>We detected caching plugin(s): <strong><?php echo esc_html(implode(', ', $cache_plugins)); ?></strong></p>
-            <p>For optimal performance with live search, consider excluding these URLs from caching:</p>
+            <p><strong><?php echo esc_html__('SK Live Search Cache Configuration:', 'live-search'); ?></strong></p>
+            <p><?php echo sprintf(
+                esc_html__('We detected caching plugin(s): %s', 'live-search'),
+                '<strong>' . esc_html(implode(', ', $cache_plugins)) . '</strong>'
+            ); ?></p>
+            <p><?php echo esc_html__('For optimal performance with live search, consider excluding these URLs from caching:', 'live-search'); ?></p>
             <ul style="list-style-type: disc; margin-left: 20px;">
                 <li><code>/wp-admin/admin-ajax.php*</code></li>
                 <li><code>*action=live_search*</code></li>
                 <li><code>*action=live_search_refresh_nonce*</code></li>
             </ul>
-            <p>Also consider setting cache expiration to 1 hour or less for pages with search functionality.</p>
+            <p><?php echo esc_html__('Also consider setting cache expiration to 1 hour or less for pages with search functionality.', 'live-search'); ?></p>
         </div>
         <script>
         jQuery(document).ready(function($) {

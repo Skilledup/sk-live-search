@@ -2,17 +2,17 @@
 # This file is distributed under the Commercial.
 msgid ""
 msgstr ""
-"Project-Id-Version: Live Search 1.0.0\n"
+"Project-Id-Version: Live Search 1.0.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/live-search\n"
 "POT-Creation-Date: 2025-02-05T19:45:06+00:00\n"
-"PO-Revision-Date: 2025-02-05 23:23+0330\n"
+"PO-Revision-Date: 2025-08-18 02:00+0330\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.6\n"
 "X-Domain: live-search\n"
 
 #. Plugin Name of the plugin
@@ -29,7 +29,7 @@ msgstr "http://anbarestany.ir"
 #. Description of the plugin
 #: live-search.php
 msgid "A plugin to add live search functionality to your WordPress site."
-msgstr "افزودن امکان جستجو زنده به وردپرس"
+msgstr "افزودن امکان جستجو زنده به وردپرس."
 
 #. Author of the plugin
 #: live-search.php
@@ -43,3 +43,59 @@ msgstr "نتیجه‌ای یافت نشد..."
 #: live-search.php:65
 msgid "More results..."
 msgstr "نتایج بیشتر..."
+
+#: sk-live-search.php:128
+msgid "Missing nonce"
+msgstr "توکن امنیتی موجود نیست"
+
+#: sk-live-search.php:135
+msgid "Invalid nonce"
+msgstr "توکن امنیتی نامعتبر"
+
+#: sk-live-search.php:234
+msgid "SK Live Search Cache Configuration:"
+msgstr "تنظیمات کش جستجو زنده:"
+
+#: sk-live-search.php:236
+msgid "We detected caching plugin(s): %s"
+msgstr "افزونه(های) کش شناسایی شد: %s"
+
+#: sk-live-search.php:239
+msgid "For optimal performance with live search, consider excluding these URLs from caching:"
+msgstr "برای عملکرد بهینه جستجو زنده، این آدرس‌ها را از کش مستثنی کنید:"
+
+#: sk-live-search.php:245
+msgid "Also consider setting cache expiration to 1 hour or less for pages with search functionality."
+msgstr "همچنین انقضای کش صفحات دارای جستجو را حداکثر ۱ ساعت تنظیم کنید."
+
+#: sk-live-search.php:41
+msgid "Search suggestions"
+msgstr "پیشنهادات جستجو"
+
+#: sk-live-search.php:42
+msgid "1 suggestion available"
+msgstr "۱ پیشنهاد موجود است"
+
+#: sk-live-search.php:43
+msgid "%d suggestions available"
+msgstr "%d پیشنهاد موجود است"
+
+#: sk-live-search.php:44
+msgid "Search temporarily unavailable. Please try again."
+msgstr "جستجو موقتاً در دسترس نیست. لطفاً دوباره تلاش کنید."
+
+#: sk-live-search.php:45
+msgid "Search security token refreshed successfully"
+msgstr "توکن امنیتی جستجو با موفقیت بروزرسانی شد"
+
+#: sk-live-search.php:46
+msgid "Search security token refresh failed"
+msgstr "بروزرسانی توکن امنیتی جستجو ناموفق"
+
+#: sk-live-search.php:47
+msgid "Security token error detected, attempting refresh and retry"
+msgstr "خطای توکن امنیتی شناسایی شد، تلاش برای بروزرسانی و تکرار"
+
+#: sk-live-search.php:48
+msgid "Search request failed"
+msgstr "درخواست جستجو ناموفق"

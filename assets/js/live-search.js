@@ -41,16 +41,16 @@ jQuery(document).ready(function ($) {
                     if (response.success && response.data.nonce) {
                         liveSearchData.nonce = response.data.nonce;
                         lastNonceRefresh = response.data.timestamp;
-                        console.log('Live Search: Nonce refreshed successfully');
+                        console.log('Live Search: ' + liveSearchData.i18n.nonce_refreshed);
                         resolve(response.data.nonce);
                     } else {
-                        console.warn('Live Search: Nonce refresh failed:', response);
-                        reject(new Error('Nonce refresh failed'));
+                        console.warn('Live Search: ' + liveSearchData.i18n.nonce_refresh_failed, response);
+                        reject(new Error(liveSearchData.i18n.nonce_refresh_failed));
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.warn('Live Search: Nonce refresh error:', error);
-                    reject(new Error('Nonce refresh error: ' + error));
+                    console.warn('Live Search: ' + liveSearchData.i18n.nonce_refresh_failed, error);
+                    reject(new Error(liveSearchData.i18n.nonce_refresh_failed + ': ' + error));
                 }
             });
         });
@@ -112,7 +112,7 @@ jQuery(document).ready(function ($) {
                         xhr.status === 403;
                     
                     if (isNonceError && retryCount < MAX_RETRY_ATTEMPTS && liveSearchData.cache_aware_mode) {
-                        console.log('Live Search: Nonce error detected, attempting refresh and retry #' + (retryCount + 1));
+                        console.log('Live Search: ' + liveSearchData.i18n.nonce_error_detected + ' #' + (retryCount + 1));
                         
                         refreshNonce().then(function(newNonce) {
                             // Retry with new nonce
@@ -121,10 +121,10 @@ jQuery(document).ready(function ($) {
                             resolve(retryResponse);
                         }).catch(function(refreshError) {
                             console.error('Live Search: Nonce refresh and retry failed:', refreshError);
-                            reject(new Error('Search failed after nonce refresh'));
+                            reject(new Error(liveSearchData.i18n.search_failed));
                         });
                     } else {
-                        reject(new Error('Search request failed: ' + error));
+                        reject(new Error(liveSearchData.i18n.search_failed + ': ' + error));
                     }
                 }
             });
@@ -243,7 +243,7 @@ jQuery(document).ready(function ($) {
         $results.attr({
             'id': resultsId,
             'role': 'listbox',
-            'aria-label': 'Search suggestions'
+            'aria-label': liveSearchData.i18n.search_suggestions
         });
 
         // Prevent form submission for live search
@@ -313,8 +313,8 @@ jQuery(document).ready(function ($) {
                                 // Announce results to screen readers
                                 const resultCount = $results.find('[role="option"]').length;
                                 const announcement = resultCount === 1 ? 
-                                    '1 suggestion available' : 
-                                    resultCount + ' suggestions available';
+                                    liveSearchData.i18n.one_suggestion : 
+                                    liveSearchData.i18n.suggestions_available.replace('%d', resultCount);
                                 
                                 // Create or update announcement element
                                 let $announcement = $('#live-search-announcement');
@@ -330,7 +330,7 @@ jQuery(document).ready(function ($) {
                         })
                         .catch(function(error) {
                             console.error('Live Search: Search failed:', error);
-                            $results.html('<div class="live-search-error" role="status" aria-live="polite">Search temporarily unavailable. Please try again.</div>');
+                            $results.html('<div class="live-search-error" role="status" aria-live="polite">' + liveSearchData.i18n.search_unavailable + '</div>');
                             $results.show();
                         })
                         .finally(function() {
