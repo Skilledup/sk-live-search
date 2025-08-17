@@ -2,10 +2,133 @@ jQuery(document).ready(function ($) {
     let searchTimer;
     let activeSearchInput = null;
     let selectedResultIndex = -1;
+    let nonceRefreshTimer;
+    let lastNonceRefresh = liveSearchData.nonce_timestamp || 0;
+    
+    // Cache-aware live search configuration
+    const NONCE_REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
+    const NONCE_MAX_AGE = 10 * 60 * 60 * 1000; // 10 hours (WordPress default is 12-24 hours)
+    const MAX_RETRY_ATTEMPTS = 2;
 
     // Generate unique IDs for ARIA relationships
     function generateUniqueId(prefix) {
         return prefix + '-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Check if nonce needs refreshing based on age
+    function isNonceStale() {
+        const currentTime = Date.now();
+        const nonceAge = currentTime - (lastNonceRefresh * 1000);
+        return nonceAge > NONCE_MAX_AGE;
+    }
+
+    // Refresh nonce function
+    function refreshNonce() {
+        return new Promise(function(resolve, reject) {
+            if (!liveSearchData.cache_aware_mode) {
+                resolve(liveSearchData.nonce);
+                return;
+            }
+
+            $.ajax({
+                url: liveSearchData.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: liveSearchData.refresh_nonce_action
+                },
+                timeout: 5000,
+                success: function(response) {
+                    if (response.success && response.data.nonce) {
+                        liveSearchData.nonce = response.data.nonce;
+                        lastNonceRefresh = response.data.timestamp;
+                        console.log('Live Search: Nonce refreshed successfully');
+                        resolve(response.data.nonce);
+                    } else {
+                        console.warn('Live Search: Nonce refresh failed:', response);
+                        reject(new Error('Nonce refresh failed'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.warn('Live Search: Nonce refresh error:', error);
+                    reject(new Error('Nonce refresh error: ' + error));
+                }
+            });
+        });
+    }
+
+    // Setup periodic nonce refresh
+    function setupNonceRefresh() {
+        if (!liveSearchData.cache_aware_mode) return;
+        
+        // Clear existing timer
+        if (nonceRefreshTimer) {
+            clearInterval(nonceRefreshTimer);
+        }
+        
+        // Set up periodic refresh
+        nonceRefreshTimer = setInterval(function() {
+            refreshNonce().catch(function(error) {
+                console.warn('Live Search: Periodic nonce refresh failed:', error);
+            });
+        }, NONCE_REFRESH_INTERVAL);
+        
+        // Refresh immediately if nonce is stale
+        if (isNonceStale()) {
+            refreshNonce().catch(function(error) {
+                console.warn('Live Search: Initial nonce refresh failed:', error);
+            });
+        }
+    }
+
+    // Enhanced AJAX function with nonce retry logic
+    function performLiveSearch(searchQuery, $input, $results, $loadingIndicator, retryCount) {
+        retryCount = retryCount || 0;
+        
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: liveSearchData.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'live_search',
+                    s: searchQuery,
+                    nonce: liveSearchData.nonce
+                },
+                timeout: 10000,
+                success: function(response) {
+                    resolve(response);
+                },
+                error: function(xhr, status, error) {
+                    // Try to parse error response
+                    let errorData = null;
+                    try {
+                        errorData = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        // Not JSON, probably a different error
+                    }
+                    
+                    // Check if it's a nonce error and we haven't exhausted retries
+                    const isNonceError = errorData && 
+                        (errorData.data && errorData.data.code === 'invalid_nonce') ||
+                        xhr.status === 403;
+                    
+                    if (isNonceError && retryCount < MAX_RETRY_ATTEMPTS && liveSearchData.cache_aware_mode) {
+                        console.log('Live Search: Nonce error detected, attempting refresh and retry #' + (retryCount + 1));
+                        
+                        refreshNonce().then(function(newNonce) {
+                            // Retry with new nonce
+                            return performLiveSearch(searchQuery, $input, $results, $loadingIndicator, retryCount + 1);
+                        }).then(function(retryResponse) {
+                            resolve(retryResponse);
+                        }).catch(function(refreshError) {
+                            console.error('Live Search: Nonce refresh and retry failed:', refreshError);
+                            reject(new Error('Search failed after nonce refresh'));
+                        });
+                    } else {
+                        reject(new Error('Search request failed: ' + error));
+                    }
+                }
+            });
+        });
     }
 
     // Update ARIA attributes based on results state
@@ -178,15 +301,8 @@ jQuery(document).ready(function ($) {
                 searchTimer = setTimeout(function () {
                     $loadingIndicator.show();
 
-                    $.ajax({
-                        url: liveSearchData.ajaxurl,
-                        type: 'POST',
-                        data: {
-                            action: 'live_search',
-                            s: searchQuery,
-                            nonce: liveSearchData.nonce
-                        },
-                        success: function (response) {
+                    performLiveSearch(searchQuery, $input, $results, $loadingIndicator)
+                        .then(function(response) {
                             $results.html(response);
                             const hasResults = $results.find('[role="option"]').length > 0;
                             
@@ -211,10 +327,15 @@ jQuery(document).ready(function ($) {
                                 updateARIAAttributes($input, $results, false, false);
                                 $results.show(); // Still show "no results" message
                             }
-                        }
-                    }).always(function () {
-                        $loadingIndicator.hide();
-                    });
+                        })
+                        .catch(function(error) {
+                            console.error('Live Search: Search failed:', error);
+                            $results.html('<div class="live-search-error" role="status" aria-live="polite">Search temporarily unavailable. Please try again.</div>');
+                            $results.show();
+                        })
+                        .finally(function() {
+                            $loadingIndicator.hide();
+                        });
                 }, 500);
             })
             .on('keydown', function (e) {
@@ -285,6 +406,19 @@ jQuery(document).ready(function ($) {
             $('.live-search-results').hide();
             selectedResultIndex = -1;
             activeSearchInput = null;
+        }
+    });
+    
+    // Initialize cache-aware features
+    setupNonceRefresh();
+    
+    // Clean up timers when page unloads
+    $(window).on('beforeunload', function() {
+        if (nonceRefreshTimer) {
+            clearInterval(nonceRefreshTimer);
+        }
+        if (searchTimer) {
+            clearTimeout(searchTimer);
         }
     });
 });
