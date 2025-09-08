@@ -61,6 +61,9 @@ add_action('plugins_loaded', 'live_search_load_textdomain');
 /**
  * Get multilingual search URL that works with Polylang and WPML
  * 
+ * This function automatically strips front page slugs from language URLs to ensure
+ * search URLs point to the language root (e.g., /fr/ instead of /fr/home_page/).
+ * 
  * @param string $search_query The search query to append to the URL
  * @return string The complete search URL with language support
  */
@@ -71,15 +74,34 @@ function sk_live_search_get_multilingual_search_url($search_query) {
     if (function_exists('pll_current_language') && function_exists('pll_home_url')) {
         $current_lang = pll_current_language();
         if ($current_lang) {
-            $base_url = pll_home_url($current_lang);
+            $lang_home_url = pll_home_url($current_lang);
+
+            // If static front page and slug present, strip it
+            if (get_option('show_on_front') === 'page' && get_option('page_on_front')) {
+                $front_page = get_post(get_option('page_on_front'));
+                if ($front_page) {
+                    $parsed = wp_parse_url($lang_home_url);
+                    $parts  = explode('/', trim($parsed['path'], '/'));
+                    if (end($parts) === $front_page->post_name) {
+                        array_pop($parts); // remove slug
+                        $parsed['path'] = '/' . implode('/', $parts) . '/';
+                        
+                        // Preserve port (query and fragment will be handled at the end)
+                        $host = $parsed['host'] . (isset($parsed['port']) ? ':' . $parsed['port'] : '');
+                        
+                        $lang_home_url = untrailingslashit($parsed['scheme'] . '://' . $host . $parsed['path']);
+                    }
+                }
+            }
+            $base_url = $lang_home_url;
         }
     }
     // Check for WPML plugin
-    elseif (function_exists('apply_filters') && has_filter('wpml_current_language')) {
+    elseif (has_filter('wpml_current_language')) {
         $current_lang = apply_filters('wpml_current_language', null);
         if ($current_lang) {
             // For WPML, we need to get the home URL for the current language
-            if (function_exists('apply_filters') && has_filter('wpml_home_url')) {
+            if (has_filter('wpml_home_url')) {
                 $base_url = apply_filters('wpml_home_url', home_url('/'), $current_lang);
             } else {
                 // Fallback: construct URL manually for WPML
@@ -87,7 +109,7 @@ function sk_live_search_get_multilingual_search_url($search_query) {
             }
         }
     }
-    // fallback
+    // fallback for non-multilingual sites
     else {
         $base_url = home_url('/');
     }
