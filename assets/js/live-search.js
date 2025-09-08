@@ -260,7 +260,7 @@ jQuery(document).ready(function ($) {
 
         // Process input
         $input.not('.search-input-processed')
-            .addClass('search-input-processed')
+            .addClass('search-input-processed sk-live-search-input')
             .attr({
                 'autocomplete': 'off',
                 'role': 'combobox',
@@ -411,6 +411,35 @@ jQuery(document).ready(function ($) {
     
     // Initialize cache-aware features
     setupNonceRefresh();
+    
+    // Global keyboard shortcut: Ctrl + / to focus SK Live Search input
+    $(document).on('keydown', function(e) {
+        // Check for Ctrl + / (forward slash)
+        if (e.ctrlKey && e.key === '/') {
+            e.preventDefault();
+            
+            // Find the first visible SK Live Search input (only inputs processed by this plugin)
+            const $searchInput = $('.sk-live-search-input').filter(function() {
+                const $input = $(this);
+                // Check if the input is visible and not disabled
+                return $input.is(':visible') && !$input.prop('disabled') && !$input.prop('readonly');
+            }).first();
+            
+            // Focus the search input if found
+            if ($searchInput.length > 0) {
+                $searchInput.focus();
+                
+                // Scroll the input into view if needed
+                $searchInput[0].scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                
+                // Optional: Select all text in the input for easier replacement
+                $searchInput.select();
+            }
+        }
+    });
     
     // Clean up timers when page unloads
     $(window).on('beforeunload', function() {

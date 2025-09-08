@@ -224,6 +224,25 @@ form.search {
     }
 }
 
+/* Enhanced focus styles for keyboard navigation */
+.search-input-wrapper input[type="search"]:focus,
+.search-input-wrapper input[name="s"]:focus,
+.sk-live-search-input:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+/* High contrast support for better visibility */
+@media (prefers-contrast: high) {
+    .search-input-wrapper input[type="search"]:focus,
+    .search-input-wrapper input[name="s"]:focus,
+    .sk-live-search-input:focus {
+        outline: 3px solid;
+        box-shadow: 0 0 0 2px;
+    }
+}
+
 /* Responsive design for mobile devices */
 @media (max-width: 600px) {
     .live-search-results {
