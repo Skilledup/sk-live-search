@@ -179,18 +179,17 @@ function live_search_ajax()
     $args = array(
         's' => $search_query,
         'post_status' => 'publish',
-        'posts_per_page' => 10,
+        'posts_per_page' => 11, // Get one extra to check if more exist
+        'no_found_rows' => true, // Don't calculate total rows - major performance boost
+        'update_post_meta_cache' => false, // Don't load post meta - we only need title and permalink
+        'update_post_term_cache' => false, // Don't load taxonomy terms - not needed for search results
     );
 
-    // Get total number of posts for this search
-    $total_query = new WP_Query(array_merge($args, array('posts_per_page' => -1)));
-    $total_posts = $total_query->found_posts;
-    wp_reset_postdata();
-
     $query = new WP_Query($args);
+    $has_more_results = ($query->post_count > 10);
     if ($query->have_posts()) {
         $result_index = 0;
-        while ($query->have_posts()) {
+        while ($query->have_posts() && $result_index < 10) { // Limit to 10 results
             $query->the_post();
             $result_index++;
 ?>
@@ -203,11 +202,11 @@ function live_search_ajax()
         }
 
         // Add "More results..." link if there are more than 10 results
-        if ($total_posts > 10) {
+        if ($has_more_results) {
             $result_index++;
         ?>
             <div class="live-search-more-results" role="option" tabindex="-1" aria-selected="false" data-result-index="<?php echo esc_attr($result_index); ?>">
-                <a href="<?php echo esc_url(sk_live_search_get_multilingual_search_url($search_query)); ?>" tabindex="-1" aria-label="<?php echo esc_attr(sprintf(__('View all %d search results for: %s', 'live-search'), $total_posts, $search_query)); ?>">
+                <a href="<?php echo esc_url(sk_live_search_get_multilingual_search_url($search_query)); ?>" tabindex="-1" aria-label="<?php echo esc_attr(sprintf(__('View more search results for: %s', 'live-search'), $search_query)); ?>">
                     <?php echo esc_html__('More results...', 'live-search'); ?>
                 </a>
             </div>
