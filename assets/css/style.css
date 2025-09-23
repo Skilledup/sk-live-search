@@ -251,3 +251,34 @@ form.search {
         right: 0;
     }
 }
+
+/* Shortcut hint styling (only visible on Non-mobile devices) */
+@media (min-width: 575px) {
+    .search-input-wrapper::after {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 1.5rem;
+        padding-right: 0.4rem;
+        padding-left: 0.4rem;
+        font-size: .75rem;
+        color: #61788e;
+        background-color: #f5f7fa;
+        content: "Ctrl + /";
+        border: 1px solid #dee3e9;
+        border-radius: 6px;
+        direction: LTR !important;
+    }
+    
+    /* Hide shortcut hint when search input is focused */
+    .search-input-wrapper input[type="search"]:focus + ::after,
+    .search-input-wrapper input[name="s"]:focus + ::after,
+    .search-input-wrapper .sk-live-search-input:focus + ::after,
+    .search-input-wrapper:focus-within::after {
+        display: none;
+    }
+}
