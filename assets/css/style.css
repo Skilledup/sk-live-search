@@ -258,7 +258,7 @@ form.search {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        left: 0.75rem;
+        right: 0.75rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -272,6 +272,11 @@ form.search {
         border: 1px solid #dee3e9;
         border-radius: 6px;
         direction: LTR !important;
+    }
+
+    .search-input-wrapper::after:dir(rtl) {
+        right: auto;
+        left: 0.75rem;
     }
     
     /* Hide shortcut hint when search input is focused */
