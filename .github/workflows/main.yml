@@ -33,9 +33,9 @@ jobs:
           rsync -av --exclude='.git*' --exclude='node_modules' --exclude='.*' --exclude='CODE_OF_CONDUCT.md' --exclude='CONTRIBUTING.md' --exclude='ISSUE_TEMPLATE.md' --exclude='PULL_REQUEST_TEMPLATE.md' --exclude='*.dist' --exclude='*.yml' --exclude='*.neon' --exclude='composer.*' --exclude='dev-helpers' --exclude='build' --exclude='wporg-assets' --exclude='phpunit*' --exclude='.github' . build/sk-live-search/
           
       - name: Create artifact
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -X -r build/sk-live-search.zip build/sk-live-search
+        run: |
+          cd build
+          zip -X -r sk-live-search.zip sk-live-search
           
       - name: Upload artifact
         uses: actions/upload-artifact@v4
