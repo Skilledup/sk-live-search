@@ -93,7 +93,8 @@ form.search {
     z-index: 100;
 }
 
-.live-search-loading:dir(rtl) {
+[dir="rtl"] .live-search-loading,
+html[dir="rtl"] .live-search-loading {
     left: 12px;
     right: auto;
 }
@@ -274,7 +275,9 @@ form.search {
         direction: LTR !important;
     }
 
-    .search-input-wrapper::after:dir(rtl) {
+    /* RTL support using attribute selector for better browser compatibility */
+    [dir="rtl"] .search-input-wrapper::after,
+    html[dir="rtl"] .search-input-wrapper::after {
         right: auto;
         left: 0.75rem;
     }
