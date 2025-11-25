@@ -3,7 +3,7 @@
 Plugin Name: SK Live Search
 Plugin URI: 
 Description: A plugin to add live search functionality to your WordPress site.
-Version: 1.0.5
+Version: 1.0.6
 Author: Mohammad Anbarestany
 Author URI: https://anbarestany.ir
 Text Domain: live-search
@@ -19,8 +19,8 @@ if (!defined('ABSPATH')) {
 function live_search_enqueue_scripts()
 {
     wp_enqueue_script('jquery');
-    wp_enqueue_script('live-search', plugin_dir_url(__FILE__) . 'assets/js/live-search.js', array('jquery'), '1.0.5', true);
-    wp_enqueue_style('live-search-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), '1.0.5');
+    wp_enqueue_script('live-search', plugin_dir_url(__FILE__) . 'assets/js/live-search.js', array('jquery'), '1.0.6', true);
+    wp_enqueue_style('live-search-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), '1.0.6');
 
     // Set cache control headers for dynamic content
     if (!headers_sent()) {

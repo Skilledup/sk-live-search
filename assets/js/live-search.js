@@ -383,17 +383,23 @@ jQuery(document).ready(function ($) {
                 const $input = $(this);
                 // Delay closing to allow for result clicks
                 setTimeout(function () {
+                    // Only close if we're not clicking inside the results container
                     if (activeSearchInput && activeSearchInput[0] === $input[0]) {
                         const $results = $input.closest('form').find('.live-search-results');
-                        closeResults($input, $results);
+                        // Check if the active element is within the results
+                        if (!$.contains($results[0], document.activeElement) && 
+                            !$results.is(':hover')) {
+                            closeResults($input, $results);
+                        }
                     }
-                }, 150);
+                }, 200);
             });
     });
 
     // Handle clicks on search results
-    $(document).on('click', '.live-search-result, .live-search-more-results', function (e) {
+    $(document).on('mousedown', '.live-search-result, .live-search-more-results', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         const $link = $(this).find('a');
         if ($link.length) {
             window.location.href = $link.attr('href');
