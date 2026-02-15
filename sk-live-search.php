@@ -3,7 +3,7 @@
 Plugin Name: SK Live Search
 Plugin URI: 
 Description: A plugin to add live search functionality to your WordPress site.
-Version: 1.0.6
+Version: 1.0.7
 Author: Mohammad Anbarestany
 Author URI: https://anbarestany.ir
 Text Domain: live-search
@@ -19,36 +19,24 @@ if (!defined('ABSPATH')) {
 function live_search_enqueue_scripts()
 {
     wp_enqueue_script('jquery');
-    wp_enqueue_script('live-search', plugin_dir_url(__FILE__) . 'assets/js/live-search.js', array('jquery'), '1.0.6', true);
-    wp_enqueue_style('live-search-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), '1.0.6');
+    wp_enqueue_script('live-search', plugin_dir_url(__FILE__) . 'assets/js/live-search.js', array('jquery'), '1.0.7', true);
+    wp_enqueue_style('live-search-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), '1.0.7');
 
-    // Set cache control headers for dynamic content
-    if (!headers_sent()) {
-        // Don't cache pages with live search for logged-in users
-        if (is_user_logged_in()) {
-            header('Cache-Control: no-cache, no-store, must-revalidate');
-            header('Pragma: no-cache');
-            header('Expires: 0');
-        } else {
-            // For non-logged-in users, set shorter cache time
-            header('Cache-Control: public, max-age=3600'); // 1 hour cache
-        }
-    }
+    // Note: Cache headers are not set here because:
+    // 1. Headers are likely already sent at this point
+    // 2. AJAX endpoints handle their own cache headers
+    // 3. Page caching is better controlled by cache plugins
 
     wp_localize_script('live-search', 'liveSearchData', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('live_search_nonce'),
-        'nonce_timestamp' => time(),
         'refresh_nonce_action' => 'live_search_refresh_nonce',
-        'cache_aware_mode' => true,
         'i18n' => array(
             'search_suggestions' => __('Search suggestions', 'live-search'),
             'one_suggestion' => __('1 suggestion available', 'live-search'),
             'suggestions_available' => __('%d suggestions available', 'live-search'),
             'search_unavailable' => __('Search temporarily unavailable. Please try again.', 'live-search'),
-            'nonce_refreshed' => __('Search security token refreshed successfully', 'live-search'),
             'nonce_refresh_failed' => __('Search security token refresh failed', 'live-search'),
-            'nonce_error_detected' => __('Security token error detected, attempting refresh and retry', 'live-search'),
             'search_failed' => __('Search request failed', 'live-search')
         )
     ));
@@ -222,81 +210,3 @@ function live_search_ajax()
 }
 add_action('wp_ajax_live_search', 'live_search_ajax');
 add_action('wp_ajax_nopriv_live_search', 'live_search_ajax');
-
-/**
- * Show cache exclusion notice for administrators
- *
- * @return void
- */
-function live_search_cache_exclusion_notice() {
-    // Only show to administrators
-    if (!current_user_can('manage_options')) {
-        return;
-    }
-
-    $cache_plugins = array();
-    
-    // Check for common caching plugins
-    if (is_plugin_active('w3-total-cache/w3-total-cache.php')) {
-        $cache_plugins[] = 'W3 Total Cache';
-    }
-    if (is_plugin_active('wp-super-cache/wp-cache.php')) {
-        $cache_plugins[] = 'WP Super Cache';
-    }
-    if (is_plugin_active('wp-fastest-cache/wpFastestCache.php')) {
-        $cache_plugins[] = 'WP Fastest Cache';
-    }
-    if (is_plugin_active('litespeed-cache/litespeed-cache.php')) {
-        $cache_plugins[] = 'LiteSpeed Cache';
-    }
-    if (is_plugin_active('wp-rocket/wp-rocket.php')) {
-        $cache_plugins[] = 'WP Rocket';
-    }
-
-    if (!empty($cache_plugins)) {
-        ?>
-        <div class="notice notice-info is-dismissible" id="live-search-cache-notice">
-            <p><strong><?php echo esc_html__('SK Live Search Cache Configuration:', 'live-search'); ?></strong></p>
-            <p><?php echo sprintf(
-                esc_html__('We detected caching plugin(s): %s', 'live-search'),
-                '<strong>' . esc_html(implode(', ', $cache_plugins)) . '</strong>'
-            ); ?></p>
-            <p><?php echo esc_html__('For optimal performance with live search, consider excluding these URLs from caching:', 'live-search'); ?></p>
-            <ul style="list-style-type: disc; margin-left: 20px;">
-                <li><code>/wp-admin/admin-ajax.php*</code></li>
-                <li><code>*action=live_search*</code></li>
-                <li><code>*action=live_search_refresh_nonce*</code></li>
-            </ul>
-            <p><?php echo esc_html__('Also consider setting cache expiration to 1 hour or less for pages with search functionality.', 'live-search'); ?></p>
-        </div>
-        <script>
-        jQuery(document).ready(function($) {
-            $(document).on('click', '#live-search-cache-notice .notice-dismiss', function() {
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'live_search_dismiss_cache_notice',
-                        nonce: '<?php echo wp_create_nonce('dismiss_cache_notice'); ?>'
-                    }
-                });
-            });
-        });
-        </script>
-        <?php
-    }
-}
-
-// Handle dismissing the cache notice
-function live_search_dismiss_cache_notice() {
-    if (wp_verify_nonce($_POST['nonce'], 'dismiss_cache_notice')) {
-        update_option('live_search_cache_notice_dismissed', true);
-    }
-    wp_die();
-}
-add_action('wp_ajax_live_search_dismiss_cache_notice', 'live_search_dismiss_cache_notice');
-
-// Show cache notice only if not dismissed
-if (!get_option('live_search_cache_notice_dismissed')) {
-    add_action('admin_notices', 'live_search_cache_exclusion_notice');
-}

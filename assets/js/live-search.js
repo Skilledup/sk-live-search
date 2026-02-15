@@ -2,12 +2,6 @@ jQuery(document).ready(function ($) {
     let searchTimer;
     let activeSearchInput = null;
     let selectedResultIndex = -1;
-    let nonceRefreshTimer;
-    let lastNonceRefresh = liveSearchData.nonce_timestamp || 0;
-    
-    // Cache-aware live search configuration
-    const NONCE_REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
-    const NONCE_MAX_AGE = 10 * 60 * 60 * 1000; // 10 hours (WordPress default is 12-24 hours)
     const MAX_RETRY_ATTEMPTS = 2;
 
     // Generate unique IDs for ARIA relationships
@@ -15,21 +9,9 @@ jQuery(document).ready(function ($) {
         return prefix + '-' + Math.random().toString(36).substr(2, 9);
     }
 
-    // Check if nonce needs refreshing based on age
-    function isNonceStale() {
-        const currentTime = Date.now();
-        const nonceAge = currentTime - (lastNonceRefresh * 1000);
-        return nonceAge > NONCE_MAX_AGE;
-    }
-
-    // Refresh nonce function
+    // Refresh nonce via AJAX (used when a search fails due to stale/cached nonce)
     function refreshNonce() {
         return new Promise(function(resolve, reject) {
-            if (!liveSearchData.cache_aware_mode) {
-                resolve(liveSearchData.nonce);
-                return;
-            }
-
             $.ajax({
                 url: liveSearchData.ajaxurl,
                 type: 'POST',
@@ -40,47 +22,19 @@ jQuery(document).ready(function ($) {
                 success: function(response) {
                     if (response.success && response.data.nonce) {
                         liveSearchData.nonce = response.data.nonce;
-                        lastNonceRefresh = response.data.timestamp;
-                        console.log('Live Search: ' + liveSearchData.i18n.nonce_refreshed);
                         resolve(response.data.nonce);
                     } else {
-                        console.warn('Live Search: ' + liveSearchData.i18n.nonce_refresh_failed, response);
                         reject(new Error(liveSearchData.i18n.nonce_refresh_failed));
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.warn('Live Search: ' + liveSearchData.i18n.nonce_refresh_failed, error);
                     reject(new Error(liveSearchData.i18n.nonce_refresh_failed + ': ' + error));
                 }
             });
         });
     }
 
-    // Setup periodic nonce refresh
-    function setupNonceRefresh() {
-        if (!liveSearchData.cache_aware_mode) return;
-        
-        // Clear existing timer
-        if (nonceRefreshTimer) {
-            clearInterval(nonceRefreshTimer);
-        }
-        
-        // Set up periodic refresh
-        nonceRefreshTimer = setInterval(function() {
-            refreshNonce().catch(function(error) {
-                console.warn('Live Search: Periodic nonce refresh failed:', error);
-            });
-        }, NONCE_REFRESH_INTERVAL);
-        
-        // Refresh immediately if nonce is stale
-        if (isNonceStale()) {
-            refreshNonce().catch(function(error) {
-                console.warn('Live Search: Initial nonce refresh failed:', error);
-            });
-        }
-    }
-
-    // Enhanced AJAX function with nonce retry logic
+    // AJAX search with automatic nonce refresh on failure (handles cached pages)
     function performLiveSearch(searchQuery, $input, $results, $loadingIndicator, retryCount) {
         retryCount = retryCount || 0;
         
@@ -95,37 +49,28 @@ jQuery(document).ready(function ($) {
                 },
                 timeout: 10000,
                 success: function(response) {
+                    // WordPress nonce errors return HTTP 200 with {success: false},
+                    // so we must check for them here, not in the error callback
+                    if (typeof response === 'object' && response.success === false) {
+                        var isNonceError = response.data &&
+                            (response.data.code === 'invalid_nonce' || response.data.code === 'missing_nonce');
+                        
+                        if (isNonceError && retryCount < MAX_RETRY_ATTEMPTS) {
+                            // Transparently refresh nonce and retry the search
+                            refreshNonce().then(function() {
+                                return performLiveSearch(searchQuery, $input, $results, $loadingIndicator, retryCount + 1);
+                            }).then(resolve).catch(function() {
+                                reject(new Error(liveSearchData.i18n.search_failed));
+                            });
+                            return;
+                        }
+                        reject(new Error(liveSearchData.i18n.search_failed));
+                        return;
+                    }
                     resolve(response);
                 },
                 error: function(xhr, status, error) {
-                    // Try to parse error response
-                    let errorData = null;
-                    try {
-                        errorData = JSON.parse(xhr.responseText);
-                    } catch (e) {
-                        // Not JSON, probably a different error
-                    }
-                    
-                    // Check if it's a nonce error and we haven't exhausted retries
-                    const isNonceError = errorData && 
-                        (errorData.data && errorData.data.code === 'invalid_nonce') ||
-                        xhr.status === 403;
-                    
-                    if (isNonceError && retryCount < MAX_RETRY_ATTEMPTS && liveSearchData.cache_aware_mode) {
-                        console.log('Live Search: ' + liveSearchData.i18n.nonce_error_detected + ' #' + (retryCount + 1));
-                        
-                        refreshNonce().then(function(newNonce) {
-                            // Retry with new nonce
-                            return performLiveSearch(searchQuery, $input, $results, $loadingIndicator, retryCount + 1);
-                        }).then(function(retryResponse) {
-                            resolve(retryResponse);
-                        }).catch(function(refreshError) {
-                            console.error('Live Search: Nonce refresh and retry failed:', refreshError);
-                            reject(new Error(liveSearchData.i18n.search_failed));
-                        });
-                    } else {
-                        reject(new Error(liveSearchData.i18n.search_failed + ': ' + error));
-                    }
+                    reject(new Error(liveSearchData.i18n.search_failed + ': ' + error));
                 }
             });
         });
@@ -399,9 +344,6 @@ jQuery(document).ready(function ($) {
         }
     });
     
-    // Initialize cache-aware features
-    setupNonceRefresh();
-    
     // Global keyboard shortcut: Ctrl + / to focus SK Live Search input
     $(document).on('keydown', function(e) {
         // Check for Ctrl + / (forward slash)
@@ -433,9 +375,6 @@ jQuery(document).ready(function ($) {
     
     // Clean up timers when page unloads
     $(window).on('beforeunload', function() {
-        if (nonceRefreshTimer) {
-            clearInterval(nonceRefreshTimer);
-        }
         if (searchTimer) {
             clearTimeout(searchTimer);
         }
