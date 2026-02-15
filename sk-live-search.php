@@ -22,11 +22,6 @@ function live_search_enqueue_scripts()
     wp_enqueue_script('live-search', plugin_dir_url(__FILE__) . 'assets/js/live-search.js', array('jquery'), '1.0.7', true);
     wp_enqueue_style('live-search-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), '1.0.7');
 
-    // Note: Cache headers are not set here because:
-    // 1. Headers are likely already sent at this point
-    // 2. AJAX endpoints handle their own cache headers
-    // 3. Page caching is better controlled by cache plugins
-
     wp_localize_script('live-search', 'liveSearchData', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('live_search_nonce'),
