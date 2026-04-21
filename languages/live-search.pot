@@ -1,100 +1,90 @@
-# Copyright (C) 2025 Mohammad Anbarestany
-# This file is distributed under the Commercial.
+# Copyright (C) 2026 Mohammad Anbarestany
+# This file is distributed under the GPL-3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Live Search 1.0.3\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/live-search\n"
+"Project-Id-Version: SK Live Search 1.0.8\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/sk-live-search\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-02-05T19:45:06+00:00\n"
+"POT-Creation-Date: 2026-04-21T19:18:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.11.0\n"
-"X-Domain: live-search\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: sk-live-search\n"
 
 #. Plugin Name of the plugin
-#: live-search.php
-msgid "Live Search"
-msgstr ""
-
-#. Plugin URI of the plugin
-#. Author URI of the plugin
-#: live-search.php
-msgid "http://anbarestany.ir"
+#: sk-live-search.php
+msgid "SK Live Search"
 msgstr ""
 
 #. Description of the plugin
-#: live-search.php
+#: sk-live-search.php
 msgid "A plugin to add live search functionality to your WordPress site."
 msgstr ""
 
 #. Author of the plugin
-#: live-search.php
+#: sk-live-search.php
 msgid "Mohammad Anbarestany"
 msgstr ""
 
-#: live-search.php:49
-msgid "no results found..."
+#. Author URI of the plugin
+#: sk-live-search.php
+msgid "https://anbarestany.ir"
 msgstr ""
 
-#: live-search.php:65
-msgid "More results..."
-msgstr ""
-
-#: sk-live-search.php:128
-msgid "Missing nonce"
-msgstr ""
-
-#: sk-live-search.php:135
-msgid "Invalid nonce"
-msgstr ""
-
-#: sk-live-search.php:234
-msgid "SK Live Search Cache Configuration:"
-msgstr ""
-
-#: sk-live-search.php:236
-msgid "We detected caching plugin(s): %s"
-msgstr ""
-
-#: sk-live-search.php:239
-msgid "For optimal performance with live search, consider excluding these URLs from caching:"
-msgstr ""
-
-#: sk-live-search.php:245
-msgid "Also consider setting cache expiration to 1 hour or less for pages with search functionality."
-msgstr ""
-
-#: sk-live-search.php:41
+#: sk-live-search.php:30
 msgid "Search suggestions"
 msgstr ""
 
-#: sk-live-search.php:42
+#: sk-live-search.php:31
 msgid "1 suggestion available"
 msgstr ""
 
-#: sk-live-search.php:43
+#. translators: %d is the number of suggestions available.
+#: sk-live-search.php:33
+#, php-format
 msgid "%d suggestions available"
 msgstr ""
 
-#: sk-live-search.php:44
+#: sk-live-search.php:34
 msgid "Search temporarily unavailable. Please try again."
 msgstr ""
 
-#: sk-live-search.php:45
-msgid "Search security token refreshed successfully"
-msgstr ""
-
-#: sk-live-search.php:46
+#: sk-live-search.php:35
 msgid "Search security token refresh failed"
 msgstr ""
 
-#: sk-live-search.php:47
-msgid "Security token error detected, attempting refresh and retry"
+#: sk-live-search.php:36
+msgid "Search request failed"
 msgstr ""
 
-#: sk-live-search.php:48
-msgid "Search request failed"
+#: sk-live-search.php:133
+msgid "Missing nonce"
+msgstr ""
+
+#: sk-live-search.php:140
+msgid "Invalid nonce"
+msgstr ""
+
+#: sk-live-search.php:150
+#: sk-live-search.php:201
+msgid "no results found..."
+msgstr ""
+
+#. translators: 1: result index number, 2: post title.
+#: sk-live-search.php:175
+#, php-format
+msgid "Search result %1$d: %2$s"
+msgstr ""
+
+#. translators: %s is the search query.
+#: sk-live-search.php:191
+#, php-format
+msgid "View more search results for: %s"
+msgstr ""
+
+#: sk-live-search.php:194
+msgid "More results..."
 msgstr ""
