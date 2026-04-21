@@ -128,6 +128,9 @@ add_action('wp_ajax_nopriv_live_search_refresh_nonce', 'live_search_refresh_nonc
 // Handle the AJAX request
 function live_search_ajax()
 {
+    // admin-ajax may use the logged-in user's profile language; force site locale for frontend search responses.
+    switch_to_locale(get_locale());
+
     if (!isset($_POST['nonce'])) {
         wp_send_json_error(array(
             'message' => __('Missing nonce', 'sk-live-search'),
