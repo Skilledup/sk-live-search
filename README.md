@@ -23,6 +23,7 @@ AJAX-powered, instant search results for your WordPress search forms. Works out 
 - **Arrow Up/Down**: Navigate through search results
 - **Enter**: Select highlighted result
 - **Escape**: Close search results
+- **Tab**: Close search results and move focus
 
 
 
